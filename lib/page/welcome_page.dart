@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vigenesia/page/login_page.dart';
 import 'package:vigenesia/page/register_page.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -38,14 +39,14 @@ class WelcomePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  height: 70,
+                  height: 60,
                 ),
               ],
             ),
           ),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.only(top: 100, left: 20, right: 20),
+              padding: const EdgeInsets.only(top: 70, left: 20, right: 20),
               width: width,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -57,8 +58,8 @@ class WelcomePage extends StatelessWidget {
                   ],
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(90),
-                  topRight: Radius.circular(90),
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
                 ),
               ),
               child: Column(
@@ -115,7 +116,9 @@ class WelcomePage extends StatelessWidget {
                     height: 10,
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       minimumSize: const Size(double.infinity, 50),

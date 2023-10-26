@@ -197,8 +197,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               itemBuilder: (context, index) {
                                 return Card(
                                   child: ListTile(
-                                    title: Text('Motivasi $index'),
-                                    subtitle: Text('Hansen'),
+                                    tileColor: Color(0xffF5F5F5),
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    title: const Text('Hansen'),
+                                    subtitle: const Text('Haiya, lu olang kalau mau kaya jangan rebahan mulu lo, cali kelja lo, phei a phei !'),
+                                    trailing: IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.favorite_border),
+                                    ),
                                   ),
                                 );
                               },
@@ -208,8 +217,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               itemBuilder: (context, index) {
                                 return Card(
                                   child: ListTile(
-                                    title: Text('Motivasi $index'),
-                                    subtitle: Text('Hansen'),
+                                    tileColor: Color(0xffF5F5F5),
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    title: const Text('Senin, 20 September 2023'),
+                                    subtitle: const Text('Haiya, lu olang kalau mau kaya jangan rebahan mulu lo, cali kelja lo, phei a phei !'),
+                                    trailing: IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.delete),
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 );
                               },
@@ -231,14 +250,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Color(0xffBC0BE6),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage('https://www.example.com/profile-picture.jpg'),
+                    backgroundImage: NetworkImage('https://conferenceoeh.com/wp-content/uploads/profile-pic-dummy.png'),
                   ),
                   SizedBox(height: 10),
                   Text(

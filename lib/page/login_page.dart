@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vigenesia/page/home_page.dart';
 import 'package:vigenesia/page/register_page.dart';
 
 class LoginPage extends StatelessWidget {
@@ -61,8 +62,8 @@ class LoginPage extends StatelessWidget {
                   ],
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(90),
-                  topRight: Radius.circular(90),
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
                 ),
               ),
               child: SingleChildScrollView(
@@ -71,7 +72,7 @@ class LoginPage extends StatelessWidget {
                     const Text(
                       'Sign In',
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 28,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -144,7 +145,9 @@ class LoginPage extends StatelessWidget {
                       height: 35,
                     ),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+                      },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: const Color(0xffBC0BE6),
                         backgroundColor: Colors.white,

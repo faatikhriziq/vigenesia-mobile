@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'page/home_page.dart';
+import 'package:vigenesia/page/welcome_page.dart';
 
 void main(List<String> args) {
   runApp(const MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: WelcomePage(),
     );
   }
 }

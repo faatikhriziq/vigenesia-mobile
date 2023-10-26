@@ -61,8 +61,8 @@ class RegisterPage extends StatelessWidget {
                   ],
                 ),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(90),
-                  topRight: Radius.circular(90),
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
                 ),
               ),
               child: SingleChildScrollView(
@@ -71,7 +71,7 @@ class RegisterPage extends StatelessWidget {
                     const Text(
                       'Register',
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 28,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
