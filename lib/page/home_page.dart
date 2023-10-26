@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -197,7 +196,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               itemBuilder: (context, index) {
                                 return Card(
                                   child: ListTile(
-                                    tileColor: Color(0xffF5F5F5),
+                                    tileColor: const Color(0xffF5F5F5),
                                     shape: RoundedRectangleBorder(
                                       side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
                                       borderRadius: BorderRadius.circular(12),
@@ -217,7 +216,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               itemBuilder: (context, index) {
                                 return Card(
                                   child: ListTile(
-                                    tileColor: Color(0xffF5F5F5),
+                                    tileColor: const Color(0xffF5F5F5),
                                     shape: RoundedRectangleBorder(
                                       side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
                                       borderRadius: BorderRadius.circular(12),
@@ -279,30 +278,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
               onTap: () {
                 // Navigate to home page
               },
             ),
             ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
               onTap: () {
                 // Navigate to profile page
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
               onTap: () {
                 // Navigate to settings page
               },
             ),
-            Divider(),
+            const Divider(),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
               onTap: () {
                 // Perform logout action
               },
