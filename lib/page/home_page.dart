@@ -1,6 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:vigenesia/bloc/motivation/motivation_bloc.dart';
+import 'package:vigenesia/data/datasource/local/auth_local_datasource.dart';
+import 'package:vigenesia/data/model/request/motivation_request_model.dart';
+import 'package:vigenesia/page/login_page.dart';
 
 class HomePage extends StatefulWidget {
+  static const routeName = '/home';
   const HomePage({super.key});
 
   @override
@@ -9,6 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final TabController _tabController;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -39,7 +49,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () async {
+              final logout = await AuthLocalDatasource().removeAuthData();
+              if (logout) {
+                context.go(LoginPage.routeName);
+              }
+            },
             icon: const Icon(Icons.logout),
           ),
         ],
@@ -130,6 +145,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Column(
                     children: [
                       TextFormField(
+                        controller: _controller,
                         textInputAction: TextInputAction.done,
                         cursorColor: const Color(0xffBC0BE6),
                         decoration: const InputDecoration(
@@ -152,21 +168,46 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       const SizedBox(
                         height: 20,
                       ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: const Color(0xffBC0BE6),
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: const Text(
-                          'Kirim',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
+                      BlocConsumer<MotivationBloc, MotivationState>(builder: (context, state) {
+                        if (state is MotivationLoading) {
+                          return const CircularProgressIndicator(
+                            color: Colors.purple,
+                          );
+                        } else {
+                          return ElevatedButton(
+                            onPressed: () {
+                              final model = MotivationRequestModel(motivation: _controller.text);
+                              context.read<MotivationBloc>().add(PostMotivation(model));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: const Color(0xffBC0BE6),
+                              minimumSize: const Size(double.infinity, 50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: const Text(
+                              'Kirim',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        }
+                      }, listener: (context, state) {
+                        if (state is MotivationError) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(state.message),
+                            ),
+                          );
+                        } else if (state is MotivationSuccess) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(state.motivation.message),
+                            ),
+                          );
+                        }
+                      }),
                       const SizedBox(
                         height: 20,
                       ),

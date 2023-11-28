@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vigenesia/page/login_page.dart';
 import 'package:vigenesia/page/register_page.dart';
 
 class WelcomePage extends StatelessWidget {
+  static const routeName = '/welcome';
   const WelcomePage({super.key});
 
   @override
@@ -116,7 +118,7 @@ class WelcomePage extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                      context.go(LoginPage.routeName);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,

@@ -1,8 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:vigenesia/page/login_page.dart';
 
-class RegisterPage extends StatelessWidget {
+import '../bloc/register/register_bloc.dart';
+import '../data/model/request/register_request_model.dart';
+
+class RegisterPage extends StatefulWidget {
+  static const routeName = '/register';
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController? _nameController;
+  TextEditingController? _professionController;
+  TextEditingController? _emailController;
+  TextEditingController? _passwordController;
+
+  @override
+  void initState() {
+    _nameController = TextEditingController();
+    _professionController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController!.dispose();
+    _professionController!.dispose();
+    _emailController!.dispose();
+    _passwordController!.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +113,7 @@ class RegisterPage extends StatelessWidget {
                       height: 20,
                     ),
                     TextField(
+                      controller: _nameController,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
@@ -111,6 +146,7 @@ class RegisterPage extends StatelessWidget {
                       height: 20,
                     ),
                     TextField(
+                      controller: _professionController,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
@@ -143,6 +179,7 @@ class RegisterPage extends StatelessWidget {
                       height: 20,
                     ),
                     TextField(
+                      controller: _emailController,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
@@ -175,6 +212,7 @@ class RegisterPage extends StatelessWidget {
                       height: 20,
                     ),
                     TextField(
+                      controller: _passwordController,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
@@ -206,21 +244,53 @@ class RegisterPage extends StatelessWidget {
                     const SizedBox(
                       height: 35,
                     ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color(0xffBC0BE6),
-                        backgroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    BlocConsumer<RegisterBloc, RegisterState>(builder: (context, state) {
+                      if (state is RegisterLoading) {
+                        return const CircularProgressIndicator(
+                          color: Colors.white,
+                        );
+                      }
+                      return ElevatedButton(
+                        onPressed: () {
+                          context.read<RegisterBloc>().add(DoRegister(
+                                  model: RegisterRequestModel(
+                                name: _nameController!.text,
+                                profesi: _professionController!.text,
+                                email: _emailController!.text,
+                                password: _passwordController!.text,
+                              )));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: const Color(0xffBC0BE6),
+                          backgroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                        child: const Text(
+                          'Sign Up',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      );
+                    }, listener: (context, state) {
+                      if (state is RegisterSuccess) {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.model.message),
+                          ),
+                        );
+                      }
+
+                      if (state is RegisterError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                          ),
+                        );
+                      }
+                    }),
                     const SizedBox(
                       height: 10,
                     ),
@@ -235,7 +305,7 @@ class RegisterPage extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                            context.go(LoginPage.routeName);
                           },
                           child: const Text(
                             'Sign In',

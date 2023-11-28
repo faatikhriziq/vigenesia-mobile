@@ -1,9 +1,39 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:vigenesia/bloc/login/login_bloc.dart';
+import 'package:vigenesia/data/datasource/local/auth_local_datasource.dart';
+import 'package:vigenesia/data/model/request/logn_request_model.dart';
 import 'package:vigenesia/page/home_page.dart';
 import 'package:vigenesia/page/register_page.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  static const routeName = '/login';
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController? _emailController;
+  TextEditingController? _passwordController;
+  bool isPasswordVisible = false;
+  @override
+  void initState() {
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _emailController!.dispose();
+    _passwordController!.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +110,7 @@ class LoginPage extends StatelessWidget {
                       height: 20,
                     ),
                     TextField(
+                      controller: _emailController,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
@@ -112,6 +143,8 @@ class LoginPage extends StatelessWidget {
                       height: 20,
                     ),
                     TextField(
+                      controller: _passwordController,
+                      obscureText: true,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                       decoration: InputDecoration(
@@ -143,23 +176,51 @@ class LoginPage extends StatelessWidget {
                     const SizedBox(
                       height: 35,
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color(0xffBC0BE6),
-                        backgroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    BlocConsumer<LoginBloc, LoginState>(builder: (context, state) {
+                      if (state is LoginLoading) {
+                        return const CircularProgressIndicator(
+                          color: Colors.white,
+                        );
+                      }
+                      return ElevatedButton(
+                        onPressed: () {
+                          final model = LoginRequestModel(
+                            email: _emailController!.text,
+                            password: _passwordController!.text,
+                          );
+                          context.read<LoginBloc>().add(DoLogin(model: model));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: const Color(0xffBC0BE6),
+                          backgroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Sign In',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      );
+                    }, listener: (context, state) async {
+                      if (state is LoginError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                          ),
+                        );
+                      } else if (state is LoginSuccess) {
+                        await AuthLocalDatasource().saveAuthData(state.model);
+
+                        context.go(HomePage.routeName);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Login Success'),
+                          ),
+                        );
+                      }
+                    }),
                     const SizedBox(
                       height: 10,
                     ),
@@ -174,11 +235,12 @@ class LoginPage extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+                            context.go(RegisterPage.routeName);
                           },
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(
+                              fontWeight: FontWeight.w900,
                               color: Colors.white,
                             ),
                           ),
