@@ -1,12 +1,18 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vigenesia/bloc/get_all_motivation/get_all_motivation_bloc.dart';
+import 'package:vigenesia/bloc/get_motivation_user/get_motivation_user_bloc.dart';
 import 'package:vigenesia/bloc/motivation/motivation_bloc.dart';
 import 'package:vigenesia/data/datasource/local/auth_local_datasource.dart';
 import 'package:vigenesia/data/model/request/motivation_request_model.dart';
 import 'package:vigenesia/page/login_page.dart';
+
+import '../bloc/delete_motivation/delete_motivation_bloc.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home';
@@ -18,20 +24,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final TabController _tabController;
-  final TextEditingController _controller = TextEditingController();
+  TextEditingController? _controller;
 
   @override
   void initState() {
-    super.initState();
+    getMotivation();
+    getMotivationUser();
+    _controller = TextEditingController();
     _tabController = TabController(
       vsync: this, // the SingleTickerProviderStateMixin
       length: 2, // this is the number of tabs.
     );
+    super.initState();
+  }
+
+  void getMotivation() {
+    context.read<GetAllMotivationBloc>().add(GetAllMotivation());
+  }
+
+  void getMotivationUser() {
+    context.read<GetMotivationUserBloc>().add(GetMotivationUser());
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -40,10 +58,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+        ),
         elevation: 0,
         title: const Text(
           'ViGeNesia',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: const Color(0xffBC0BE6),
         centerTitle: true,
@@ -55,7 +84,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 context.go(LoginPage.routeName);
               }
             },
-            icon: const Icon(Icons.logout),
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -176,8 +208,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         } else {
                           return ElevatedButton(
                             onPressed: () {
-                              final model = MotivationRequestModel(motivation: _controller.text);
+                              final model = MotivationRequestModel(motivation: _controller!.text);
                               context.read<MotivationBloc>().add(PostMotivation(model));
+                              FocusScope.of(context).unfocus();
+                              setState(() {
+                                _controller!.clear();
+                              });
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
@@ -198,14 +234,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(state.message),
+                              backgroundColor: Colors.red,
                             ),
                           );
                         } else if (state is MotivationSuccess) {
+                          // getMotivation();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(state.motivation.message),
+                              backgroundColor: Colors.green,
                             ),
                           );
+                          setState(() {
+                            getMotivation();
+                            getMotivationUser();
+                          });
                         }
                       }),
                       const SizedBox(
@@ -232,47 +275,80 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         child: TabBarView(
                           controller: _tabController,
                           children: [
-                            ListView.builder(
-                              itemCount: 10,
-                              itemBuilder: (context, index) {
-                                return Card(
-                                  child: ListTile(
-                                    tileColor: const Color(0xffF5F5F5),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    title: const Text('Hansen'),
-                                    subtitle: const Text('Haiya, lu olang kalau mau kaya jangan rebahan mulu lo, cali kelja lo, phei a phei !'),
-                                    trailing: IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.favorite_border),
-                                    ),
+                            BlocBuilder<GetAllMotivationBloc, GetAllMotivationState>(builder: (context, state) {
+                              if (state is GetAllMotivationLoading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.purple,
                                   ),
                                 );
-                              },
-                            ),
-                            ListView.builder(
-                              itemCount: 10,
-                              itemBuilder: (context, index) {
-                                return Card(
-                                  child: ListTile(
-                                    tileColor: const Color(0xffF5F5F5),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    title: const Text('Senin, 20 September 2023'),
-                                    subtitle: const Text('Haiya, lu olang kalau mau kaya jangan rebahan mulu lo, cali kelja lo, phei a phei !'),
-                                    trailing: IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.delete),
-                                      color: Colors.red,
-                                    ),
+                              } else if (state is GetAllMotivationSuccess) {
+                                return ListView.builder(
+                                  itemCount: state.motivation.data.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      child: ListTile(
+                                        tileColor: const Color(0xffF5F5F5),
+                                        shape: RoundedRectangleBorder(
+                                          side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        title: Text(state.motivation.data[index].motivation),
+                                        subtitle: Text(state.motivation.data[index].createdAt.toString()),
+                                        trailing: IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(Icons.favorite_border),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else if (state is GetAllMotivationError) {
+                                return Center(child: Text(state.message));
+                              }
+                              return const Center(child: Text(''));
+                            }),
+                            BlocBuilder<GetMotivationUserBloc, GetMotivationUserState>(builder: (context, state) {
+                              if (state is GetMotivationUserLoading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.purple,
                                   ),
                                 );
-                              },
-                            ),
+                              } else if (state is GetMotivationUserSuccess) {
+                                return ListView.builder(
+                                  itemCount: state.motivation.data.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      child: ListTile(
+                                        tileColor: const Color(0xffF5F5F5),
+                                        shape: RoundedRectangleBorder(
+                                          side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        title: Text(state.motivation.data[index].motivation),
+                                        subtitle: Text(state.motivation.data[index].createdAt.toString()),
+                                        trailing: IconButton(
+                                          onPressed: () {
+                                            context.read<DeleteMotivationBloc>().add(DeleteMotivation(state.motivation.data[index].id));
+                                            setState(() {
+                                              getMotivation();
+                                              getMotivationUser();
+                                            });
+                                          },
+                                          icon: const Icon(Icons.delete),
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else if (state is GetMotivationUserError) {
+                                return Center(child: Text(state.message));
+                              } else {
+                                return const Center(child: Text(''));
+                              }
+                            }),
                           ],
                         ),
                       )

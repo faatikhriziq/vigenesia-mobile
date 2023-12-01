@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vigenesia/bloc/delete_motivation/delete_motivation_bloc.dart';
+import 'package:vigenesia/bloc/get_all_motivation/get_all_motivation_bloc.dart';
+import 'package:vigenesia/bloc/get_motivation_user/get_motivation_user_bloc.dart';
 import 'package:vigenesia/bloc/motivation/motivation_bloc.dart';
 import 'package:vigenesia/bloc/register/register_bloc.dart';
 import 'package:vigenesia/data/datasource/local/auth_local_datasource.dart';
@@ -37,6 +40,9 @@ class MyApp extends StatelessWidget {
             MotivationDatasource(),
           ),
         ),
+        BlocProvider(create: (context) => GetAllMotivationBloc(MotivationDatasource())),
+        BlocProvider(create: (context) => GetMotivationUserBloc(MotivationDatasource(), AuthLocalDatasource())),
+        BlocProvider(create: (context) => DeleteMotivationBloc(MotivationDatasource())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

@@ -5,6 +5,7 @@ sealed class MotivationEvent {}
 
 class PostMotivation extends MotivationEvent {
   final MotivationRequestModel motivation;
-
   PostMotivation(this.motivation);
 }
+
+class GetMotivation extends MotivationEvent {}
