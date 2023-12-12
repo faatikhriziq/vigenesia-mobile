@@ -130,7 +130,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                     child: const Text(
                       'Sign In',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
                 ],

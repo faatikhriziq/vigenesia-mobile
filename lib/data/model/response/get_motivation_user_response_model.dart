@@ -52,11 +52,11 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        username: json["username"],
-        motivation: json["motivation"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
+        id: json["id"] ?? 0,
+        username: json["username"] ?? "",
+        motivation: json["motivation"] ?? "",
+        createdAt: DateTime.parse(json["created_at"] ?? ""),
+        updatedAt: DateTime.parse(json["updated_at"] ?? ""),
       );
 
   Map<String, dynamic> toJson() => {

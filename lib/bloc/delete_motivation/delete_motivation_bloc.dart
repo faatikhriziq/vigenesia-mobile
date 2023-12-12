@@ -10,9 +10,9 @@ part 'delete_motivation_state.dart';
 class DeleteMotivationBloc extends Bloc<DeleteMotivationEvent, DeleteMotivationState> {
   final MotivationDatasource _motivationDatasource;
   DeleteMotivationBloc(this._motivationDatasource) : super(DeleteMotivationInitial()) {
-    on<DeleteMotivation>((event, emit) {
+    on<DeleteMotivation>((event, emit) async {
       emit(DeleteMotivationLoading());
-      _motivationDatasource.deleteMotivation(event.id).then((value) {
+      await _motivationDatasource.deleteMotivation(event.id).then((value) {
         value.fold(
           (l) => emit(DeleteMotivationFailure(l)),
           (r) => emit(DeleteMotivationSuccess(r)),

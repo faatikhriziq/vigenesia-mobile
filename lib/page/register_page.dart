@@ -275,7 +275,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       );
                     }, listener: (context, state) {
                       if (state is RegisterSuccess) {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                        context.go(LoginPage.routeName);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(state.model.message),

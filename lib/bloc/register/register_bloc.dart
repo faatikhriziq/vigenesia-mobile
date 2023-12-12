@@ -14,7 +14,6 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     on<DoRegister>((event, emit) async {
       emit(RegisterLoading());
       final result = await _authDatasource.register(event.model);
-
       result.fold(
         (l) => emit(
           RegisterError(message: l),
@@ -25,5 +24,4 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       );
     });
   }
-
 }

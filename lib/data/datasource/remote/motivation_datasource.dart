@@ -50,7 +50,7 @@ class MotivationDatasource {
     } else if (res.statusCode == 404) {
       return const Left("Belum ada motivasi");
     } else {
-      return Left(result['errors']);
+      return Left(result['message']);
     }
   }
 
@@ -68,6 +68,8 @@ class MotivationDatasource {
 
     if (res.statusCode == 200) {
       return Right(GetMotivationUserResponseModel.fromJson(result));
+    } else if (res.statusCode == 404) {
+      return const Left("Belum ada motivasi");
     } else {
       return Left(result['message']);
     }

@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:vigenesia/bloc/get_all_motivation/get_all_motivation_bloc.dart';
 import 'package:vigenesia/bloc/get_motivation_user/get_motivation_user_bloc.dart';
 import 'package:vigenesia/bloc/motivation/motivation_bloc.dart';
@@ -59,7 +60,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
           icon: const Icon(
             Icons.menu,
             color: Colors.white,
@@ -116,17 +119,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   bottomRight: Radius.circular(65),
                 ),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Text(
-                    'Halo, Hansen',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
+                  FutureBuilder(
+                      future: AuthLocalDatasource().getName(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator(
+                            color: Colors.white,
+                          );
+                        } else {
+                          return Text(
+                            'Halo, ${snapshot.data}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        }
+                      }),
+                  const Text(
                     'Bagikan Motivasimu hari ini!',
                     style: TextStyle(
                       color: Colors.white,
@@ -293,12 +306,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        title: Text(state.motivation.data[index].motivation),
-                                        subtitle: Text(state.motivation.data[index].createdAt.toString()),
-                                        trailing: IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.favorite_border),
-                                        ),
+                                        title: Text(state.motivation.data[index].username),
+                                        subtitle: Text(state.motivation.data[index].motivation),
+                                        leading: const Icon(Icons.person),
+                                        // trailing: Text(DateFormat("d-M-yyyy", "id_ID").format(DateTime.parse(state.motivation.data[index].createdAt.toString()).toLocal())),
                                       ),
                                     );
                                   },
@@ -308,47 +319,57 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               }
                               return const Center(child: Text(''));
                             }),
-                            BlocBuilder<GetMotivationUserBloc, GetMotivationUserState>(builder: (context, state) {
-                              if (state is GetMotivationUserLoading) {
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.purple,
-                                  ),
-                                );
-                              } else if (state is GetMotivationUserSuccess) {
-                                return ListView.builder(
-                                  itemCount: state.motivation.data.length,
-                                  itemBuilder: (context, index) {
-                                    return Card(
-                                      child: ListTile(
-                                        tileColor: const Color(0xffF5F5F5),
-                                        shape: RoundedRectangleBorder(
-                                          side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
-                                          borderRadius: BorderRadius.circular(12),
+                            BlocBuilder<GetMotivationUserBloc, GetMotivationUserState>(
+                              builder: (context, state) {
+                                if (state is GetMotivationUserLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.purple,
+                                    ),
+                                  );
+                                } else if (state is GetMotivationUserSuccess) {
+                                  return ListView.builder(
+                                    itemCount: state.motivation.data.length,
+                                    itemBuilder: (context, index) {
+                                      return Card(
+                                        child: ListTile(
+                                          tileColor: const Color(0xffF5F5F5),
+                                          shape: RoundedRectangleBorder(
+                                            side: const BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          title: Text(state.motivation.data[index].motivation),
+                                          subtitle: Text(DateFormat("EEEE, d MMMM yyyy", "id_ID").format(DateTime.parse(state.motivation.data[index].createdAt.toString()).toLocal())),
+                                          trailing: IconButton(
+                                            onPressed: () {
+                                              context.read<DeleteMotivationBloc>().add(DeleteMotivation(state.motivation.data[index].id));
+                                              Future.delayed(const Duration(milliseconds: 500), () {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Motivasi berhasil dihapus'),
+                                                    backgroundColor: Colors.green,
+                                                  ),
+                                                );
+                                                setState(() {
+                                                  getMotivation();
+                                                  getMotivationUser();
+                                                });
+                                              });
+                                            },
+                                            icon: const Icon(Icons.delete),
+                                            color: Colors.red,
+                                          ),
                                         ),
-                                        title: Text(state.motivation.data[index].motivation),
-                                        subtitle: Text(state.motivation.data[index].createdAt.toString()),
-                                        trailing: IconButton(
-                                          onPressed: () {
-                                            context.read<DeleteMotivationBloc>().add(DeleteMotivation(state.motivation.data[index].id));
-                                            setState(() {
-                                              getMotivation();
-                                              getMotivationUser();
-                                            });
-                                          },
-                                          icon: const Icon(Icons.delete),
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              } else if (state is GetMotivationUserError) {
-                                return Center(child: Text(state.message));
-                              } else {
-                                return const Center(child: Text(''));
-                              }
-                            }),
+                                      );
+                                    },
+                                  );
+                                } else if (state is GetMotivationUserError) {
+                                  return Center(child: Text(state.message));
+                                } else {
+                                  return const Center(child: Text('Anda belum mempunyai motivasi'));
+                                }
+                              },
+                            ),
                           ],
                         ),
                       )

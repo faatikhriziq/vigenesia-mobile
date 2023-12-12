@@ -1,4 +1,4 @@
 class ApiConfig {
   ApiConfig._();
-  static String baseUrl = "https://1e11-36-68-53-244.ngrok.io";
+  static String baseUrl = "https://6668-36-68-54-19.ngrok-free.app";
 }

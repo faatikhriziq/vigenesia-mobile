@@ -2,7 +2,6 @@
 //
 //     final getMotivationResponseModel = getMotivationResponseModelFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 GetMotivationResponseModel getMotivationResponseModelFromJson(String str) => GetMotivationResponseModel.fromJson(json.decode(str));
@@ -53,11 +52,11 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        id: json["id"],
-        username: json["username"],
-        motivation: json["motivation"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+        id: json["id"] ?? 0,
+        username: json["username"] ?? "",
+        motivation: json["motivation"] ?? "",
+        createdAt: json["created_at"] ?? "",
+        updatedAt: json["updated_at"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
