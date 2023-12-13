@@ -212,6 +212,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 20,
                     ),
                     TextField(
+                      obscureText: true,
                       controller: _passwordController,
                       style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
